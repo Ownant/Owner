@@ -1,0 +1,40 @@
+services:
+  owner-service-database:
+    container_name: owner-service-database
+    image: bitnami/mongodb:latest
+    restart: always
+    ports:
+      - 27021:27017
+    networks:
+      - owner-service-network
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=owner-service-database
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=root
+      - MONGODB_DATABASE=owner-service-database
+      - MONGODB_ROOT_USERNAME=root
+      - MONGODB_ROOT_PASSWORD=root
+
+  owner-service:
+    build: .
+    container_name: owner-service
+    restart: always
+    networks:
+      - owner-service-network
+    ports:
+      - 8083:8083
+    environment:
+      - MONGO_DB_HOST=owner-service-database
+      - MONGO_DB_URI=mongodb://root:root@owner-service-database/owner-service-database?retryWrites=true&w=majority
+      - MONGODB_DATABASE=owner-service-database
+      - MONGODB_ROOT_USERNAME=root
+      - MONGODB_ROOT_PASSWORD=root
+      - MONGODB_PORT=27017
+      - AUTHENTICATION_ENDPOINT=http://user-service:8081/ownant/user/authenticate
+    depends_on:
+      - owner-service-database
+
+networks:
+  owner-service-network:
+    external:
+      name: ownant-network
