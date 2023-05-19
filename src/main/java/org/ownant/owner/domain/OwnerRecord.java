@@ -19,7 +19,6 @@ public class OwnerRecord {
     String username;
     String password;
     String email;
-    String tenantActivationCode;
     ErrorCode error;
 
 
